@@ -1,5 +1,4 @@
 import {
-  addDoc,
   collection,
   deleteDoc,
   doc,
@@ -9,7 +8,28 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore'
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 import { db } from './firebaseConfig'
+
+export const loginUser = async (email, password) => {
+  const authentication = getAuth()
+  const response = await signInWithEmailAndPassword(
+    authentication,
+    email,
+    password
+  )
+  return response
+}
+
+export const getUserFromEmail = async (email) => {
+  const queryData = query(collection(db, 'users'), where('email', '==', email))
+  const data = await getDocs(queryData)
+  const users = data?.docs?.map((doc) => ({
+    ...doc?.data(),
+    id: doc?.id,
+  }))
+  return users[0]
+}
 
 export const getDocumentsInCollection = async (collectionName) => {
   const dataCollectionReference = collection(db, collectionName)
